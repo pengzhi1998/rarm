@@ -1,0 +1,33 @@
+# Local environments and Python caches
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+
+# User-supplied datasets, demonstrations, model weights, and generated outputs
+datasets/
+data/
+checkpoints/
+test/
+outputs/
+output/
+results/
+wandb/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.npz
+*.npy
+*.hdf5
+*.h5
+*.mp4
+*.mov
+*.MOV
+*.zip
+
+# Editor files
+.idea/
+.vscode/
+.DS_Store

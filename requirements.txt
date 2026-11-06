@@ -1,0 +1,13 @@
+# Stable core validated in the local RM evaluation environment (Python 3.10).
+# Install the CUDA build of torch/torchvision separately as shown in README.md.
+torch==2.10.0
+torchvision==0.25.0
+peft==0.15.2
+transformers==4.57.1
+timm==1.0.24
+numpy==1.26.4
+pillow==12.2.0
+tqdm==4.67.1
+wandb==0.24.0
+matplotlib==3.5.3
+opencv-python==4.10.0.84
