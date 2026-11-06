@@ -39,7 +39,7 @@ def parse_args(argv=None):
     parser.add_argument("--model_name", type=str, default=None,
                         help="Specific model filename to load (e.g., 'drqv2_best.pt'). None for auto-detect.")
     parser.add_argument("--vit_checkpoint_path", default=None, help="DINOv3 checkpoint (default: checkpoints/dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth)")
-    parser.add_argument("--comparator_checkpoint_path", default=None, help="RARM checkpoint (default: checkpoints/checkpoint_epoch_65.pt)")
+    parser.add_argument("--comparator_checkpoint_path", default=None, help="RARM checkpoint (default: checkpoints/checkpoint_epoch_45_generic.pt)")
     parser.add_argument("--device", default=None, help="PyTorch device; default: CUDA if available, otherwise CPU")
     args = parser.parse_args(argv)
     if args.num_episodes <= 0:

@@ -385,7 +385,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--comparator_checkpoint_path",
-        default=str(parent_dir.parent / "checkpoints/checkpoint_epoch_65.pt"),
+        default=str(parent_dir.parent / "checkpoints/checkpoint_epoch_45_generic.pt"),
         help="Path to the trained comparator checkpoint."
     )
     parser.add_argument("--num_frames", type=int, default=5)

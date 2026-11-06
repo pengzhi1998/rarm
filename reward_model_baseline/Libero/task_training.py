@@ -38,7 +38,7 @@ def parse_args(argv=None):
                         help="Stop at an episode boundary after this many new steps; 0 means no cap")
     parser.add_argument("--similarity_threshold_offset", type=float, default=0.5)
     parser.add_argument("--vit_checkpoint_path", default=str(REPO_ROOT / "checkpoints/dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth"))
-    parser.add_argument("--comparator_checkpoint_path", default=str(REPO_ROOT / "checkpoints/checkpoint_epoch_65.pt"))
+    parser.add_argument("--comparator_checkpoint_path", default=str(REPO_ROOT / "checkpoints/checkpoint_epoch_45_generic.pt"))
     parser.add_argument("--device", default="cuda")
     args = parser.parse_args(argv)
     if args.total_timesteps <= 0 or args.steps_this_link < 0:

@@ -109,7 +109,7 @@ class ReferenceAnchoredRewardModel:
         if vit_checkpoint_path is None:
             vit_checkpoint_path = "checkpoints/dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth"
         if comparator_checkpoint_path is None:
-            comparator_checkpoint_path = "checkpoints/checkpoint_epoch_65.pt"
+            comparator_checkpoint_path = "checkpoints/checkpoint_epoch_45_generic.pt"
 
         # Convert relative paths to absolute paths from project root
         if not os.path.isabs(vit_checkpoint_path):

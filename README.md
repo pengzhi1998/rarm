@@ -32,14 +32,14 @@ LIBERO's historical requirements are not needed.
 
 ## Prepare files
 
-Checkpoints and demonstrations are not bundled. Obtain the RARM checkpoint
+Checkpoints and demonstrations are not bundled. Obtain the [RARM checkpoint](https://huggingface.co/pengzhi1998/RARM)
 separately, the [DINOv3 ViT-B/16 weights](https://github.com/facebookresearch/dinov3#pretrained-models),
 and the [official LIBERO-10 demonstrations](https://github.com/Lifelong-Robot-Learning/LIBERO#datasets).
 Place them as follows:
 
 ```text
 checkpoints/
-  checkpoint_epoch_65.pt
+  checkpoint_epoch_45_generic.pt
   dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth
 data/LIBERO_datasets/libero_10/
   <task_name>_demo.hdf5
@@ -67,8 +67,9 @@ can also replay noisy demo actions; `--use_demo_decay` gradually reduces this
 initialization. The default reward is `RARM_reward + 5 × success - 0.5`, where
 RARM rewards confident forward progress. Evaluation does not replay demo actions.
 
-This release defaults to **epoch 65**. Historical LIBERO runs used an epoch-20
-checkpoint, so their results are not claimed reproduced here.
+This release uses the generic epoch-45 checkpoint. The original LIBERO
+configuration used an epoch-20 checkpoint; results have not been revalidated
+with this generic checkpoint.
 
 ## Evaluate
 
