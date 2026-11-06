@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rarm-libero"
+version = "0.1.0"
+description = "DrQ-v2 policy training on LIBERO with Reference-Anchored Reward Models"
+readme = "README.md"
+requires-python = ">=3.10,<3.11"
+
+[tool.setuptools.packages.find]
+include = ["reward_model_baseline*"]
