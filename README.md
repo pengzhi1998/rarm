@@ -1,12 +1,12 @@
-# RARM: Reference-Anchored Reward Model
+# RARM
 
-[Project page](https://rarm-robotics.github.io/) · [Reward model (`main`)](https://github.com/pengzhi1998/rarm/tree/main) · [LIBERO policy training (`policy_training_RARM`)](https://github.com/pengzhi1998/rarm/tree/policy_training_RARM)
+[Project page](https://rarm-robotics.github.io/) · [LIBERO policy training](https://github.com/pengzhi1998/rarm/tree/policy_training_RARM)
 
-RARM compares a rollout video clip with reference demonstration clips using DINOv3 features, LoRA, temporal attention, and cross-attention. This branch contains reward-model training and similarity inference. The `policy_training_RARM` branch contains from-scratch DrQ-v2 policy training in LIBERO using RARM rewards.
+This branch contains reward-model training and clip-similarity inference. For DrQ-v2 policy training with RARM, use `policy_training_RARM`.
 
-## Installation
+## Install
 
-Use Python 3.10 and a CUDA-capable GPU for training. The model uses bfloat16. The release uses PyTorch 2.10, torchvision 0.25, PEFT 0.15.2, and Transformers 4.57.1. Checkpoint loading and inference were checked on CPU; full GPU training has not been rerun for this release.
+Use Python 3.10 and a CUDA GPU for training. Run commands from the repository root.
 
 ```bash
 git clone --branch main https://github.com/pengzhi1998/rarm.git
@@ -17,11 +17,9 @@ python -m pip install torch==2.10.0 torchvision==0.25.0 --index-url https://down
 python -m pip install -r requirements.txt
 ```
 
-Run all commands below from the repository root. DINOv3 source is loaded through Torch Hub at commit `54694f7627fd815f62a5dcc82944ffa6153bbb76`. For an offline checkout at that revision, set `RARM_DINOV3_REPO=/path/to/dinov3` before running the scripts.
+## Prepare model files
 
-## Model files
-
-Supply these files locally; this repository contains **no model weights, training data, or demonstration assets**:
+Download the [official DINOv3 ViT-B/16 weights](https://github.com/facebookresearch/dinov3#pretrained-models). Inference also requires the RARM checkpoint:
 
 ```text
 checkpoints/
@@ -29,57 +27,39 @@ checkpoints/
 └── checkpoint_epoch_65.pt
 ```
 
-Obtain the DINOv3 ViT-B/16 pretrained weights through the [official DINOv3 repository](https://github.com/facebookresearch/dinov3). Supply your RARM checkpoint as `checkpoints/checkpoint_epoch_65.pt`, or override the path. No RARM model download is bundled with this code release.
+Data and weights are not included. The current inference loader requires both files, even though the RARM checkpoint also contains the adapted DINOv3 encoder.
 
-The inspected epoch-65 checkpoint contains the DINOv3 backbone, LoRA adapters, temporal processor, cross-attention, comparison head, and optimizer state. The existing loader first initializes DINOv3 from its separate pretrained file, then loads the complete RARM state strictly. Both paths are therefore required by this release's loader. See [provenance](PROVENANCE.md) for the source-version boundary.
+## Train
 
-## Train the reward model
-
-Prepare frame folders with sortable, zero-padded names:
+Organize training frames as:
 
 ```text
-datasets/dataset_1500/ReferenceAnchoredRewardModelDataset/
-└── JPEGImages/
-    ├── video_0001/
-    │   ├── 000000.jpg
-    │   ├── 000001.jpg
-    │   └── ...
-    └── video_0002/
-        ├── 000000.png
-        └── ...
+<data_dir>/JPEGImages/<video_id>/000000.jpg
 ```
 
-The loader accepts `.jpg` and `.png`, sorts paths lexicographically, and skips videos with fewer than 30 frames. It uses only `JPEGImages`; foreground images and masks are not needed.
+Both `.jpg` and `.png` are supported. Use zero-padded filenames; videos shorter than 30 frames are skipped.
 
 ```bash
 python Reference-Anchored_RM/scripts/train.py \
   --data_dir datasets/dataset_1500/ReferenceAnchoredRewardModelDataset \
-  --vit_checkpoint_path checkpoints/dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth \
-  --output_dir checkpoints/dinov3_comparator \
-  --num_epochs 200 --batch_size 64 --learning_rate 1e-4 \
-  --num_frames 5 --temperature 0.1 --num_workers 12 --device cuda
+  --batch_size 64 --device cuda
 ```
 
-The five-frame sampler and contrastive objective follow the January 23 training version. Batch size 64 and the `dataset_1500` path reflect the supplied training edits. Adjust batch size and workers to fit your machine; changing batch size also changes the cross-video negatives. Checkpoints, `config.json`, and `losses.json` are written under a timestamped output directory, with a checkpoint every five epochs. Weights & Biases is disabled by default; use `--wandb_mode offline` or `--wandb_mode online` to enable logging.
+Defaults are 200 epochs and five frames per clip. Checkpoints are saved every five epochs under `checkpoints/dinov3_comparator/`. Adjust `--batch_size` and `--num_workers` for your machine; use `--help` for all options. Weights & Biases is disabled by default.
 
-## Run similarity inference
+## Run inference
 
-Place demo and rollout frames in separate directories, then run:
+Prepare separate demo and rollout frame folders, each with at least seven JPG/PNG frames:
 
 ```bash
 python Reference-Anchored_RM/scripts/reward_model.py \
-  --demo_dir test/IMG_2025_frames/ \
-  --rollout_dir test/IMG_2028_frames/ \
-  --vit_checkpoint_path checkpoints/dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth \
+  --demo_dir path/to/demo_frames \
+  --rollout_dir path/to/rollout_frames \
   --comparator_checkpoint_path checkpoints/checkpoint_epoch_65.pt \
   --num_frames 5 --frame_stride 1 --clip_stride 5 \
-  --device cuda --output_heatmap outputs/clip_similarity_heatmap.png
+  --device cuda --output_heatmap outputs/similarity.png
 ```
 
-Both frame directories accept `.jpg` and `.png`. The script prints the maximum rollout reward and saves a rollout-versus-demo similarity heatmap. Each online reward is the maximum similarity to the demonstration clips; it returns `-3.0` until a complete rollout clip is available.
+This saves a clip-similarity heatmap. The policy branch adds the progress-gating logic used for RL. Override `--vit_checkpoint_path` or `--comparator_checkpoint_path` to load weights from elsewhere.
 
-The original inference sampling is preserved: `clip_span = (num_frames - 1) * frame_stride + 3`. With the command above, five frames are sampled from a seven-frame span, so both input sequences need at least seven frames. Similarity is an unbounded score, not a calibrated probability or a success label. This branch does not add the later progress-gating analysis.
-
-## Source and attribution
-
-See [PROVENANCE.md](PROVENANCE.md) for original commits, release changes, and attribution. A project license has not yet been specified; third-party dependencies retain their upstream terms.
+See [PROVENANCE.md](PROVENANCE.md) for source versions and attribution.
