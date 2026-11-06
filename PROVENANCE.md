@@ -17,7 +17,7 @@ Release packaging changes to training replace machine-specific paths with comman
 
 The Jan23 commit has no `reward_model.py`. The inference script comes from `7a0c607f54a6baaf2a395644efea0ae24414c222`, January 25, 2026. Its model architecture is identical to the Jan23 model. Release changes add PNG input, portable default checkpoint paths, argument/path checks, explicit CPU/weights-only checkpoint deserialization, inference-mode heatmap evaluation, and output-directory creation. The similarity definition and original clip-index selection are retained. Later progress-gating and visualization variants are not included.
 
-The documented checkpoint filename is `checkpoint_epoch_65.pt`. Inspection of an existing file confirmed a complete model state with backbone and LoRA parameters, but the original training run/configuration has not been independently established. The checkpoint filename alone does not prove it was trained with the Jan23 commit and screenshot changes.
+The default checkpoint is `checkpoint_epoch_45_generic.pt`, whose saved zero-based epoch is 44 (the 45th epoch). Inspection confirmed a complete model state with DINOv3 backbone, LoRA, temporal, cross-attention, and comparison-head parameters. Its SHA-256 is `013b9d0a44d3833b0bb2bfaa5ee9b51120f58409338d168fff37c5eb6cb93318`. The original training run/configuration has not been independently established; selecting this checkpoint does not establish that it was trained with the Jan23 commit and screenshot changes.
 
 ## Dependencies and authorship
 

@@ -19,12 +19,12 @@ python -m pip install -r requirements.txt
 
 ## Prepare model files
 
-Download the [official DINOv3 ViT-B/16 weights](https://github.com/facebookresearch/dinov3#pretrained-models). Inference also requires the RARM checkpoint:
+Download the [official DINOv3 ViT-B/16 weights](https://github.com/facebookresearch/dinov3#pretrained-models). Inference also requires the [RARM checkpoint](https://huggingface.co/pengzhi1998/RARM):
 
 ```text
 checkpoints/
 ├── dinov3_vitb16_pretrain_lvd1689m-73cec8be.pth
-└── checkpoint_epoch_65.pt
+└── checkpoint_epoch_45_generic.pt
 ```
 
 Data and weights are not included. The current inference loader requires both files, even though the RARM checkpoint also contains the adapted DINOv3 encoder.
@@ -55,7 +55,7 @@ Prepare separate demo and rollout frame folders, each with at least seven JPG/PN
 python Reference-Anchored_RM/scripts/reward_model.py \
   --demo_dir path/to/demo_frames \
   --rollout_dir path/to/rollout_frames \
-  --comparator_checkpoint_path checkpoints/checkpoint_epoch_65.pt \
+  --comparator_checkpoint_path checkpoints/checkpoint_epoch_45_generic.pt \
   --num_frames 5 --frame_stride 1 --clip_stride 5 \
   --device cuda --output_heatmap outputs/similarity.png
 ```
